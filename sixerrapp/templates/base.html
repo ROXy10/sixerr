@@ -1,4 +1,5 @@
 {% load staticfiles %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,10 +8,10 @@
     <link rel="shortcut icon" href="{% static 'img/favicon.ico' %}">
 </head>
 <body>
-    <div>Header</div>
-    <hr/>
-    {% block page %}
-    {% endblock %}
-    <div>Footer</div>
+<div>Header</div>
+<hr/>
+{% block page %}
+{% endblock %}
+<div>Footer</div>
 </body>
 </html>
