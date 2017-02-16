@@ -8,7 +8,16 @@
     <link rel="shortcut icon" href="{% static 'img/favicon.ico' %}">
 </head>
 <body>
-<div>Header</div>
+<div>
+    <h1>Header</h1>
+    {% if user and not user.is_anonymous %}
+        Hello {{ user.get_full_name|default:user.username }}!
+    {% else %}
+        I don't think we've met before
+    {% endif %}
+    <a href="{% url 'social:begin' 'facebook' %}?next={{ request.path }}">Login</a>
+    <a href="{% url 'social:logout' %}?next={{ request.path }}">Logout</a>
+</div>
 <hr/>
 {% block page %}
 {% endblock %}
