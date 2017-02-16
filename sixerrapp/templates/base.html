@@ -16,7 +16,7 @@
         I don't think we've met before
     {% endif %}
     <a href="{% url 'social:begin' 'facebook' %}?next={{ request.path }}">Login</a>
-    <a href="{% url 'social:logout' %}?next={{ request.path }}">Logout</a>
+    <a href="{% url 'auth:logout' %}?next={{ request.path }}">Logout</a>
 </div>
 <hr/>
 {% block page %}
