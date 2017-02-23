@@ -23,4 +23,4 @@ urlpatterns = [
     url(r'^social/', include('social_django.urls', namespace='social')),
     url(r'^auth/', include('django.contrib.auth.urls', namespace='auth')),
     url('', include('sixerrapp.urls')),
-] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
