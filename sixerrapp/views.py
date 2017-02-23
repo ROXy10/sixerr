@@ -1,8 +1,13 @@
 from django.shortcuts import render
+from .models import Gig
 
 
 def home(request):
-    return render(request, 'home.html', {})
+    gigs = Gig.objects.filter(status=True)
+    context = {
+        'gigs': gigs,
+    }
+    return render(request, 'home.html', context)
 
 
 def gig_detail(request, id):
