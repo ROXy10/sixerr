@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect
+from django.views.generic import DetailView
 from .models import Gig
 
 
@@ -20,3 +21,15 @@ def gig_detail(request, id):
         'gig': gig,
     }
     return render(request, 'gig_detail.html', context)
+
+
+def create_gig(request):
+    context = {
+    }
+    return render(request, 'create_gig.html', context)
+
+
+def my_gigs(request):
+    context = {
+    }
+    return render(request, 'my_gigs.html', context)
