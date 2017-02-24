@@ -45,7 +45,17 @@
         <div class="col-md-4">
             <div class="panel panel-defaul">
                 <div class="panel-body">
-                    <button type="button" class="btn btn-success btn-block">Order Now (${{ gig.price }})</button>
+                    {% if user and not user.is_anonymous %}
+                        <form method="POST" action="/checkout/">
+                            {% csrf_token %}
+                            <div id="payment-form"></div>
+                            <input name="gig_id" value="{{ gig.id }}" hidden>
+                            <button type="submit" class="btn btn-success btn-block">Order Now (${{ gig.price }})
+                            </button>
+                        </form>
+                    {% else %}
+                        You need to login to order this gig!
+                    {% endif %}
                 </div>
             </div>
             <div class="panel panel-default">
