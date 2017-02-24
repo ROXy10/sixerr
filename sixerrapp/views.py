@@ -75,3 +75,10 @@ def my_gigs(request):
         'gigs': gigs
     }
     return render(request, 'my_gigs.html', context)
+
+
+@login_required(login_url='/')
+def profile(request, username):
+    context = {
+    }
+    return render(request, 'profile.html', context)
