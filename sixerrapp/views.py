@@ -3,7 +3,7 @@ from django.shortcuts import render, redirect
 
 import braintree
 
-from .models import Gig, Profile, Purchase
+from .models import Gig, Profile, Purchase, Review
 from .forms import GigForm
 
 
@@ -27,9 +27,11 @@ def gig_detail(request, id):
     except Gig.DoesNotExist:
         return redirect('/')
 
-    client_token = braintree.ClientToken.generate()
+    reviews = Review.objects.filter(gig=gig)
 
+    client_token = braintree.ClientToken.generate()
     context = {
+        'reviews': reviews,
         'client_token': client_token,
         'gig': gig,
     }
