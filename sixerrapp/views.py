@@ -3,7 +3,7 @@ from django.shortcuts import render, redirect
 
 import braintree
 
-from .models import Gig, Profile
+from .models import Gig, Profile, Purchase
 from .forms import GigForm
 
 
@@ -11,6 +11,7 @@ braintree.Configuration.configure(braintree.Environment.Sandbox,
                                   merchant_id='8ykhmn7wsdn2xqm7',
                                   public_key='43t9nrz7gk33r482',
                                   private_key='b9ae0d74068c14ef1ba6a073ad5dd5cb')
+
 
 def home(request):
     gigs = Gig.objects.filter(status=True)
@@ -26,7 +27,10 @@ def gig_detail(request, id):
     except Gig.DoesNotExist:
         return redirect('/')
 
+    client_token = braintree.ClientToken.generate()
+
     context = {
+        'client_token': client_token,
         'gig': gig,
     }
     return render(request, 'gig_detail.html', context)
@@ -103,3 +107,22 @@ def profile(request, username):
         'gigs': gigs,
     }
     return render(request, 'profile.html', context)
+
+
+@login_required(login_url="/")
+def create_purchase(request):
+    if request.method == 'POST':
+        try:
+            gig = Gig.objects.get(id=request.POST['gig_id'])
+        except Gig.DoesNotExist:
+            return redirect('/')
+
+        nonce = request.POST["payment_method_nonce"]
+        result = braintree.Transaction.sale({
+            "amount": gig.price,
+            "payment_method_nonce": nonce
+        })
+
+        if result.is_success:
+            Purchase.objects.create(gig=gig, buyer=request.user)
+    return redirect('/')
