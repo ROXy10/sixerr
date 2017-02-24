@@ -1,9 +1,16 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 
+import braintree
+
 from .models import Gig, Profile
 from .forms import GigForm
 
+
+braintree.Configuration.configure(braintree.Environment.Sandbox,
+                                  merchant_id='8ykhmn7wsdn2xqm7',
+                                  public_key='43t9nrz7gk33r482',
+                                  private_key='b9ae0d74068c14ef1ba6a073ad5dd5cb')
 
 def home(request):
     gigs = Gig.objects.filter(status=True)
