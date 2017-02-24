@@ -159,3 +159,21 @@ def my_buyings(request):
         'purchases': purchases,
     }
     return render(request, 'my_buyings.html', context)
+
+
+def category(request, link):
+    categories = {
+        'graphic-design': 'GD',
+        'digital-marketing': 'DM',
+        'video-animation': 'VA',
+        'music-audio': 'MA',
+        'programming-tech': 'PT',
+    }
+    try:
+        gigs = Gig.objects.filter(category=categories[link])
+        context = {
+            'gigs': gigs,
+        }
+        return render(request, 'home.html', context)
+    except KeyError:
+        return redirect('home')
