@@ -84,7 +84,9 @@ def profile(request, username):
     except Profile.DoesNotExist:
         return redirect('/')
 
+    gigs = Gig.objects.filter(user=profile.user, status=True)
     context = {
         'profile': profile
+        'gigs': gigs
     }
     return render(request, 'profile.html', context)
