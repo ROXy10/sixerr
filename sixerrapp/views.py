@@ -177,3 +177,11 @@ def category(request, link):
         return render(request, 'home.html', context)
     except KeyError:
         return redirect('home')
+
+
+def search(request):
+    gigs = Gig.objects.filter(title__contains=request.GET['title'])
+    context = {
+        'gigs': gigs,
+    }
+    return render(request, 'home.html', context)
