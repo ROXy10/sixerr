@@ -86,7 +86,7 @@ def profile(request, username):
 
     gigs = Gig.objects.filter(user=profile.user, status=True)
     context = {
-        'profile': profile
-        'gigs': gigs
+        'profile': profile,
+        'gigs': gigs,
     }
     return render(request, 'profile.html', context)
