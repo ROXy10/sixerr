@@ -41,9 +41,30 @@ def create_gig(request):
     gig_form = GigForm()
     context = {
         'gig_form': gig_form,
-        'error': error
+        'error': error,
     }
     return render(request, 'create_gig.html', context)
+
+
+@login_required(login_url='/')
+def edit_gig(request, id):
+    try:
+        gig = Gig.objects.get(id=id, user=request.user)
+        error = ''
+        if request.method == 'POST':
+            gig_form = GigForm(request.POST, request.FILES, instance=gig)
+            if gig_form.is_valid():
+                gig.save()
+                return redirect('my_gigs')
+            else:
+                error = 'Data is not valid'
+        context = {
+            'gig': gig,
+            'error': error,
+        }
+        return render(request, 'edit_gig.html', context)
+    except Gig.DoesNotExist:
+        return redirect('/')
 
 
 @login_required(login_url='/')
