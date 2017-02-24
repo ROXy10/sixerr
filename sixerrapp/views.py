@@ -27,10 +27,16 @@ def gig_detail(request, id):
     except Gig.DoesNotExist:
         return redirect('/')
 
+    if request.user.is_anonymous():
+        show_post_review = False
+    else:
+        show_post_review = Purchase.objects.filter(gig=gig, buyer=request.user).count() > 0
+
     reviews = Review.objects.filter(gig=gig)
 
     client_token = braintree.ClientToken.generate()
     context = {
+        'show_post_review' : show_post_review,
         'reviews': reviews,
         'client_token': client_token,
         'gig': gig,
