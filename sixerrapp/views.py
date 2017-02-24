@@ -126,3 +126,23 @@ def create_purchase(request):
         if result.is_success:
             Purchase.objects.create(gig=gig, buyer=request.user)
     return redirect('/')
+
+
+@login_required(login_url="/")
+def my_sellings(request):
+    purchases = Purchase.objects.filter(gig__user=request.user)
+
+    context = {
+        'purchases': purchases,
+    }
+    return render(request, 'my_sellings.html', context)
+
+
+@login_required(login_url="/")
+def my_buyings(request):
+    purchases = Purchase.objects.filter(buyer=request.user)
+
+    context = {
+        'purchases': purchases,
+    }
+    return render(request, 'my_buyings.html', context)
