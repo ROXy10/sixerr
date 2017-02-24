@@ -6,7 +6,6 @@ import braintree
 from .models import Gig, Profile, Purchase, Review
 from .forms import GigForm
 
-
 braintree.Configuration.configure(braintree.Environment.Sandbox,
                                   merchant_id='8ykhmn7wsdn2xqm7',
                                   public_key='43t9nrz7gk33r482',
@@ -22,12 +21,18 @@ def home(request):
 
 
 def gig_detail(request, id):
+    if request.method == 'POST' and not request.user.is_anonymous() \
+            and Purchase.objects.filter(gig_id=id, buyer=request.user).count() > 0 \
+            and 'content' in request.POST and request.POST['content'] != '':
+        Review.objects.create(content=request.POST['content'], gig_id=id, user=request.user)
+
     try:
         gig = Gig.objects.get(id=id)
     except Gig.DoesNotExist:
         return redirect('/')
 
-    if request.user.is_anonymous():
+    if request.user.is_anonymous() or Purchase.objects.filter(gig=gig, buyer=request.user).count() > 0 \
+            or Review.objects.filter(gig=gig, user=request.user).count() > 0:
         show_post_review = False
     else:
         show_post_review = Purchase.objects.filter(gig=gig, buyer=request.user).count() > 0
@@ -36,7 +41,7 @@ def gig_detail(request, id):
 
     client_token = braintree.ClientToken.generate()
     context = {
-        'show_post_review' : show_post_review,
+        'show_post_review': show_post_review,
         'reviews': reviews,
         'client_token': client_token,
         'gig': gig,
