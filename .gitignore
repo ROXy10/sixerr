@@ -182,6 +182,5 @@ Temporary Items
 
 .idea/
 db.sqlite3
-migrations/
 *.pyc
 
