@@ -12,6 +12,7 @@ class StaticS3BotoStorage(S3BotoStorage):
         super(StaticS3BotoStorage, self).__init__(*args, **kwargs)
 
 
+
 class MediaS3BotoStorage(S3BotoStorage):
     """
     Storage for uploaded media files.
