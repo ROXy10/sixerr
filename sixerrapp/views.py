@@ -1,5 +1,8 @@
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 from django.shortcuts import render, redirect
+
+from django.views.generic import ListView, DetailView, CreateView
 
 import braintree
 
@@ -12,46 +15,44 @@ braintree.Configuration.configure(braintree.Environment.Sandbox,
                                   private_key='b9ae0d74068c14ef1ba6a073ad5dd5cb')
 
 
-def home(request):
-    gigs = Gig.objects.filter(status=True)
-    context = {
-        'gigs': gigs,
-    }
-    return render(request, 'home.html', context)
+class HomeListView(ListView):
+    model = Gig
+    template_name = 'home.html'
+    context_object_name = 'gigs'
 
 
-def gig_detail(request, id):
-    if request.method == 'POST' and not request.user.is_anonymous() \
-            and Purchase.objects.filter(gig_id=id, buyer=request.user).count() > 0 \
-            and 'content' in request.POST and request.POST['content'] != '':
-        Review.objects.create(content=request.POST['content'], gig_id=id, user=request.user)
+class GigDetailView(DetailView):
+    model = Gig
+    template_name = 'gig_detail.html'
+    pk_url_kwarg = 'id'
 
-    try:
-        gig = Gig.objects.get(id=id)
-    except Gig.DoesNotExist:
-        return redirect('/')
+    def get_context_data(self, **kwargs):
+        if self.request.method == 'POST' and not self.request.user.is_anonymous() \
+                and Purchase.objects.filter(gig_id=id, buyer=self.request.user).count() > 0 \
+                and 'content' in self.request.POST and self.request.POST['content'] != '':
+            Review.objects.create(content=self.request.POST['content'], gig_id=id, user=self.request.user)
 
-    if request.user.is_anonymous() or Purchase.objects.filter(gig=gig, buyer=request.user).count() > 0 \
-            or Review.objects.filter(gig=gig, user=request.user).count() > 0:
-        show_post_review = False
-    else:
-        show_post_review = Purchase.objects.filter(gig=gig, buyer=request.user).count() > 0
+        gig = self.get_object()
 
-    reviews = Review.objects.filter(gig=gig)
+        if self.request.user.is_anonymous() or Purchase.objects.filter(gig=gig, buyer=self.request.user).count() > 0 \
+                or Review.objects.filter(gig=gig, user=self.request.user).count() > 0:
+            show_post_review = False
+        else:
+            show_post_review = Purchase.objects.filter(gig=gig, buyer=self.request.user).count() > 0
+        reviews = Review.objects.filter(gig=gig)
 
-    client_token = braintree.ClientToken.generate()
-    context = {
-        'show_post_review': show_post_review,
-        'reviews': reviews,
-        'client_token': client_token,
-        'gig': gig,
-    }
-    return render(request, 'gig_detail.html', context)
+        client_token = braintree.ClientToken.generate()
+        context = {
+            'show_post_review': show_post_review,
+            'reviews': reviews,
+            'client_token': client_token,
+            'gig': gig,
+        }
+        return super(GigDetailView, self).get_context_data(**context)
 
 
 @login_required(login_url='/')
 def create_gig(request):
-    error = ''
     if request.method == 'POST':
         gig_form = GigForm(request.POST, request.FILES)
         if gig_form.is_valid():
@@ -60,12 +61,9 @@ def create_gig(request):
             gig.save()
             return redirect('my_gigs')
         else:
-            error = 'Data is not valid'
+            messages.success(request, 'Data is not valid')
 
-    gig_form = GigForm()
     context = {
-        'gig_form': gig_form,
-        'error': error,
     }
     return render(request, 'create_gig.html', context)
 
@@ -74,17 +72,15 @@ def create_gig(request):
 def edit_gig(request, id):
     try:
         gig = Gig.objects.get(id=id, user=request.user)
-        error = ''
         if request.method == 'POST':
             gig_form = GigForm(request.POST, request.FILES, instance=gig)
             if gig_form.is_valid():
                 gig.save()
                 return redirect('my_gigs')
             else:
-                error = 'Data is not valid'
+                messages.success(request, 'Data is not valid')
         context = {
             'gig': gig,
-            'error': error,
         }
         return render(request, 'edit_gig.html', context)
     except Gig.DoesNotExist:

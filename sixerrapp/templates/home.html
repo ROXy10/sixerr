@@ -4,13 +4,13 @@
 
 {% block page %}
     <div class="row">
-        <div class="col-md-12"><img src="{% static 'img/saver.gif' %}" alt="" class="saver"></div>
+        <div class="background"><h1 class="background__text">Sixerr App</h1></div>
     </div>
     {% for gig in gigs %}
         <div class="col-md-3">
             <div class="thumbnail">
                 <a href="{% url 'gig_detail' gig.id %}">
-                    <img src="/media/{{ gig.photo }}" alt="">
+                    <img src="{{ gig.photo.url }}" alt="" class="list__img">
                 </a>
             </div>
             <div class="caption">
