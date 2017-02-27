@@ -183,4 +183,5 @@ Temporary Items
 .idea/
 db.sqlite3
 *.pyc
-
+staticfiles
+media
